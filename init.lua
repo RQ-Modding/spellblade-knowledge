@@ -120,6 +120,50 @@ local function weapon_ok(detail)
   return detail == SWORD or detail == SPEAR_W or detail == GLOVE
 end
 
+-- Same choice Spear makes in Ｃ再計算 / Ｔ購入スキル登録, then Spellblade on top.
+-- Rewrites an existing Melee or Thrust id. Never grants a second skill.
+local function want_basic(idx, spell_rank, spear_rank, detail)
+  local spell = spell_rank >= 3 and weapon_ok(detail)
+  local spear_thrust = spear_rank >= 3 and detail == SPEAR_W
+  if spell and spear_rank >= 3 then
+    return MT[idx]
+  end
+  if spell then
+    return SB[idx]
+  end
+  if spear_thrust then
+    return THRUST[idx]
+  end
+  return MELEE[idx]
+end
+
+local function rewrite_owned(iic, spell_rank, spear_rank, detail)
+  for _, s in ipairs(rq.chara.slots(iic)) do
+    local idx = INDEX[s.skill]
+    if idx then
+      local want = want_basic(idx, spell_rank, spear_rank, detail)
+      if want ~= s.skill then
+        rq.chara.set_slot(iic, s.slot, want)
+        rq.chara.set_flavor(iic, s.slot)
+      end
+    end
+  end
+end
+
+-- Vanilla already filled 取得可能スキル with Melee, or Thrust if Spear ★★ + spear.
+-- Swap those ids in place so costs and level locks stay, same as ▲槍かね.
+local function rewrite_shop(spell_rank, spear_rank, detail)
+  for _, row in ipairs(rq.chara.offers()) do
+    local idx = INDEX[row.skill]
+    if idx then
+      local want = want_basic(idx, spell_rank, spear_rank, detail)
+      if want ~= row.skill then
+        rq.chara.set_offer(row.index, want)
+      end
+    end
+  end
+end
+
 rq.chara.on_recalc(function(iic)
   local rank = rq.chara.rank(iic, KNOW)
   if rank >= 1 then
@@ -129,39 +173,15 @@ rq.chara.on_recalc(function(iic)
   if rank >= 2 then
     rq.chara.apply_mod(iic, 8, 10)
   end
-
-  local spear = rq.chara.rank(iic, SPEAR)
-  local detail = rq.chara.weapon_detail(iic)
-  local spell = rank >= 3 and weapon_ok(detail)
-  local both = spell and spear >= 3
-  local spear_thrust = spear >= 3 and detail == SPEAR_W
-
-  for _, s in ipairs(rq.chara.slots(iic)) do
-    local idx = INDEX[s.skill]
-    if idx then
-      local want
-      if both then
-        want = MT[idx]
-      elseif spell then
-        want = SB[idx]
-      elseif spear_thrust then
-        want = THRUST[idx]
-      else
-        want = MELEE[idx]
-      end
-      if want ~= s.skill then
-        rq.chara.set_slot(iic, s.slot, want)
-        rq.chara.set_flavor(iic, s.slot)
-      end
-    end
-  end
+  rewrite_owned(iic, rank, rq.chara.rank(iic, SPEAR), rq.chara.weapon_detail(iic))
 end)
 
 rq.chara.on_offer(function(ctx)
+  local rank = rq.chara.rank(ctx.iic, KNOW)
+  rewrite_shop(rank, rq.chara.rank(ctx.iic, SPEAR), rq.chara.weapon_detail(ctx.iic))
   if ctx.no ~= 10 and ctx.no ~= 11 and ctx.no ~= 12 then
     return nil
   end
-  local rank = rq.chara.rank(ctx.iic, KNOW)
   return { skill = KNOW, cost = 3, level = 10 + rank * 5 }
 end)
 

@@ -11,7 +11,7 @@ Lua owns who can buy it, the slot rewrite, and the damage numbers. The engine on
 | 3 | ★★ | +100 | +10 | Spellblade Attack, front only |
 | 4 | ★★★ | +300 | +10 | Spellblade Attack, front only |
 
-Rewrite needs a **sword (detail 2)**, **spear / naginata (7)**, or **glove (9)**. Both this knowledge and Spear Knowledge at rank ≥ 3 turn Melee or Thrust into **Magic Thrust** (back line allowed) on those weapons. Weapon off writes the ids back to Melee, or to Thrust if Spear Knowledge still applies. Flame Slash is left alone. Attacks stay physical, so Rizna still takes damage. Every rank deals **half final damage** to a hanny.
+Rewrite needs a **sword (detail 2)**, **spear / naginata (7)**, or **glove (9)**. Every known Melee (or Thrust) slot of that rank becomes Spellblade Attack of the same rank. The buy list swaps those ids in place, the way Spear Knowledge swaps Melee for Thrust, so Melee is not offered beside Spellblade. Both this knowledge and Spear Knowledge at rank ≥ 3 turn those slots and shop rows into **Magic Thrust** (back line allowed). Weapon off writes them back to Melee, or to Thrust if Spear Knowledge still applies. Nothing is granted as an extra skill. Flame Slash is left alone. Attacks stay physical, so Rizna still takes damage. Every rank deals **half final damage** to a hanny.
 
 Local-only git. No remote.
 
