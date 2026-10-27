@@ -100,6 +100,12 @@ for i = 1, 5 do
   })
 end
 
+for i = 1, 5 do
+  if not rq.skill.sort_as(SB[i], MELEE[i]) or not rq.skill.sort_as(MT[i], MELEE[i]) then
+    error("spellblade-knowledge: skill list sort hook missing")
+  end
+end
+
 local INDEX = {}
 for i = 1, 5 do
   INDEX[MELEE[i]] = i
@@ -150,15 +156,37 @@ local function rewrite_owned(iic, spell_rank, spear_rank, detail)
   end
 end
 
+-- Vanilla スキルポン bumps the point cost only when the row's id is already
+-- owned. Recalc has already renamed the slot, so the Melee row looks unowned
+-- and stays at the first-buy price. Reapply that curve to the rewritten id.
+local function use_cost(base, uses, char_no, skill)
+  if uses <= 0 then
+    return base
+  end
+  local cost = base
+  if uses >= 3 then cost = cost + 1 end
+  if uses >= 5 then cost = cost + 1 end
+  if uses >= 7 then cost = cost + 1 end
+  if char_no == 18 then cost = cost + 1 end
+  if skill == 213 then cost = 1 end
+  if cost > 9 then cost = 9 end
+  return cost
+end
+
 -- Vanilla already filled 取得可能スキル with Melee, or Thrust if Spear ★★ + spear.
--- Swap those ids in place so costs and level locks stay, same as ▲槍かね.
-local function rewrite_shop(spell_rank, spear_rank, detail)
+-- Swap those ids in place so the level lock stays. Scale extra-use cost off
+-- the rewritten id, matching Melee of that rank.
+local function rewrite_shop(iic, char_no, spell_rank, spear_rank, detail)
   for _, row in ipairs(rq.chara.offers()) do
     local idx = INDEX[row.skill]
     if idx then
       local want = want_basic(idx, spell_rank, spear_rank, detail)
       if want ~= row.skill then
-        rq.chara.set_offer(row.index, want)
+        local points = row.points or 0
+        if rq.chara.max_uses(iic, row.skill) <= 0 then
+          points = use_cost(points, rq.chara.max_uses(iic, want), char_no, want)
+        end
+        rq.chara.set_offer(row.index, want, points)
       end
     end
   end
@@ -178,7 +206,7 @@ end)
 
 rq.chara.on_offer(function(ctx)
   local rank = rq.chara.rank(ctx.iic, KNOW)
-  rewrite_shop(rank, rq.chara.rank(ctx.iic, SPEAR), rq.chara.weapon_detail(ctx.iic))
+  rewrite_shop(ctx.iic, ctx.no, rank, rq.chara.rank(ctx.iic, SPEAR), rq.chara.weapon_detail(ctx.iic))
   if ctx.no ~= 10 and ctx.no ~= 11 and ctx.no ~= 12 then
     return nil
   end
