@@ -143,14 +143,68 @@ local function want_basic(idx, spell_rank, spear_rank, detail)
   return MELEE[idx]
 end
 
-local function rewrite_owned(iic, spell_rank, spear_rank, detail)
+local function pick_keep(group)
+  local keep = group[1]
+  for i = 2, #group do
+    local s = group[i]
+    local sbar = s.bar or 0
+    local kbar = keep.bar or 0
+    if sbar ~= 0 and kbar == 0 then
+      keep = s
+    elseif (sbar ~= 0) == (kbar ~= 0) and s.slot < keep.slot then
+      keep = s
+    end
+  end
+  return keep
+end
+
+-- One slot per rank. Extra copies from a stale Melee buy are folded in
+-- (uses summed, cap 99) and cleared. The hotbar entry moves with the keeper.
+local function collapse_owned(iic, spell_rank, spear_rank, detail)
+  local groups = {}
   for _, s in ipairs(rq.chara.slots(iic)) do
     local idx = INDEX[s.skill]
     if idx then
-      local want = want_basic(idx, spell_rank, spear_rank, detail)
-      if want ~= s.skill then
-        rq.chara.set_slot(iic, s.slot, want)
-        rq.chara.set_flavor(iic, s.slot)
+      local g = groups[idx]
+      if not g then
+        g = {}
+        groups[idx] = g
+      end
+      g[#g + 1] = s
+    end
+  end
+  for idx, group in pairs(groups) do
+    local want = want_basic(idx, spell_rank, spear_rank, detail)
+    local keep = pick_keep(group)
+    if #group == 1 then
+      if keep.skill ~= want then
+        rq.chara.set_slot(iic, keep.slot, want)
+        rq.chara.set_flavor(iic, keep.slot)
+      end
+    else
+      local maxu, cur, bar = 0, 0, 0
+      for _, s in ipairs(group) do
+        maxu = maxu + (s.max or 0)
+        cur = cur + (s.uses or 0)
+        if bar == 0 and (s.bar or 0) ~= 0 then
+          bar = s.bar
+        end
+      end
+      if maxu > 99 then maxu = 99 end
+      if maxu < 1 then maxu = 1 end
+      if cur > maxu then cur = maxu end
+      if keep.skill ~= want then
+        rq.chara.set_slot(iic, keep.slot, want)
+        rq.chara.set_flavor(iic, keep.slot)
+      end
+      rq.chara.set_uses(iic, keep.slot, cur, maxu)
+      if (keep.bar or 0) == 0 and bar ~= 0 then
+        rq.chara.set_bar(iic, keep.slot, bar)
+      end
+      for _, s in ipairs(group) do
+        if s.slot ~= keep.slot then
+          rq.chara.clear_slot(iic, s.slot)
+        end
       end
     end
   end
@@ -173,20 +227,26 @@ local function use_cost(base, uses, char_no, skill)
   return cost
 end
 
--- Vanilla already filled 取得可能スキル with Melee, or Thrust if Spear ★★ + spear.
--- Swap those ids in place so the level lock stays. Scale extra-use cost off
--- the rewritten id, matching Melee of that rank.
+-- Vanilla already filled the buy list with Melee, or Thrust if Spear ★★ + spear.
+-- Swap that id in place so the level lock stays, and price extra uses off the
+-- rewritten id. A second family row for the same rank is dropped.
 local function rewrite_shop(iic, char_no, spell_rank, spear_rank, detail)
+  local seen = {}
   for _, row in ipairs(rq.chara.offers()) do
     local idx = INDEX[row.skill]
     if idx then
       local want = want_basic(idx, spell_rank, spear_rank, detail)
-      if want ~= row.skill then
-        local points = row.points or 0
-        if rq.chara.max_uses(iic, row.skill) <= 0 then
-          points = use_cost(points, rq.chara.max_uses(iic, want), char_no, want)
+      local points = row.points or 0
+      if want ~= row.skill and rq.chara.max_uses(iic, row.skill) <= 0 then
+        points = use_cost(points, rq.chara.max_uses(iic, want), char_no, want)
+      end
+      if seen[want] then
+        rq.chara.set_offer(row.index, 0, 0)
+      else
+        seen[want] = true
+        if want ~= row.skill or points ~= (row.points or 0) then
+          rq.chara.set_offer(row.index, want, points)
         end
-        rq.chara.set_offer(row.index, want, points)
       end
     end
   end
@@ -201,12 +261,15 @@ rq.chara.on_recalc(function(iic)
   if rank >= 2 then
     rq.chara.apply_mod(iic, 8, 10)
   end
-  rewrite_owned(iic, rank, rq.chara.rank(iic, SPEAR), rq.chara.weapon_detail(iic))
+  collapse_owned(iic, rank, rq.chara.rank(iic, SPEAR), rq.chara.weapon_detail(iic))
 end)
 
 rq.chara.on_offer(function(ctx)
   local rank = rq.chara.rank(ctx.iic, KNOW)
-  rewrite_shop(ctx.iic, ctx.no, rank, rq.chara.rank(ctx.iic, SPEAR), rq.chara.weapon_detail(ctx.iic))
+  local spear = rq.chara.rank(ctx.iic, SPEAR)
+  local detail = rq.chara.weapon_detail(ctx.iic)
+  collapse_owned(ctx.iic, rank, spear, detail)
+  rewrite_shop(ctx.iic, ctx.no, rank, spear, detail)
   if ctx.no ~= 10 and ctx.no ~= 11 and ctx.no ~= 12 then
     return nil
   end
