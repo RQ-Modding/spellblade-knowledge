@@ -1,0 +1,8 @@
+{
+  "id": "spellblade-knowledge",
+  "name": "Spellblade Knowledge",
+  "author": "Magnum Mods",
+  "version": "1.0.0",
+  "loader": "0.2.0",
+  "priority": 0
+}
