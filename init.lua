@@ -256,6 +256,11 @@ end
 
 rq.chara.on_recalc(function(iic)
   local rank = rq.chara.rank(iic, KNOW)
+  local detail = rq.chara.weapon_detail(iic)
+  -- As Spear Knowledge in Ｃ再計算: nothing without one of the weapons.
+  if not weapon_ok(detail) then
+    rank = 0
+  end
   if rank >= 1 then
     local mag = MAGIC_TOTAL[rank] or MAGIC_TOTAL[4]
     rq.chara.apply_mod(iic, 14, mag)
@@ -263,7 +268,7 @@ rq.chara.on_recalc(function(iic)
   if rank >= 2 then
     rq.chara.apply_mod(iic, 8, 10)
   end
-  collapse_owned(iic, rank, rq.chara.rank(iic, SPEAR), rq.chara.weapon_detail(iic))
+  collapse_owned(iic, rank, rq.chara.rank(iic, SPEAR), detail)
 end)
 
 rq.chara.on_offer(function(ctx)

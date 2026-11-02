@@ -4,6 +4,8 @@ Shop-only knowledge for **Elenoa Ran (10)**, **Wichita Skate (11)**, and **Rizna
 
 Lua owns who can buy it, the slot rewrite, and the damage numbers. The engine only registers the skill ids and calls Lua from recalc, the skill shop, and the physical hit path.
 
+Every effect needs one of the weapons below: without one, the knowledge gives nothing, as Spear Knowledge does without a spear.
+
 | Rank | Stars | Magic (total, not stacked) | Accuracy | Bar |
 | --- | --- | --- | --- | --- |
 | 1 | none | +50 | — | Melee |
@@ -18,7 +20,7 @@ Local-only git. No remote.
 ## Test
 
 1. Only Elenoa, Wichita, and Rizna can buy it.
-2. Rank 2: +100 Magic and +10 Accuracy. The bar still says Melee.
+2. Rank 2 + sword: +100 Magic and +10 Accuracy. The bar still says Melee. A club: no Magic, no Accuracy.
 3. Rank 3 + sword or dagger: Spellblade Attack, front only. Same with a spear and no Spear Knowledge.
 4. Both knowledges at rank 3 + glove: Magic Thrust, back line allowed.
 5. Weapon off: ids revert.
