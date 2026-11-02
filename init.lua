@@ -1,11 +1,12 @@
 -- Spellblade Knowledge. Shop-only for Elenoa (10), Wichita (11), Rizna (12).
 -- C registers the ids and calls Lua from recalc, the skill shop, physical
 -- damage (before defense), accuracy, and final-damage percent.
--- Weapon detail ids from Ｉ種類詳細／文字列: 2 Sword, 7 Spear (naginata is 7), 9 Glove.
+-- Weapon detail ids from Ｉ種類詳細／文字列: 2 Sword, 3 Shortsword (daggers), 7 Spear
+-- (naginata is 7), 9 Glove.
 
 local KNOW = 960
 local SPEAR = 317
-local SWORD, SPEAR_W, GLOVE = 2, 7, 9
+local SWORD, DAGGER, SPEAR_W, GLOVE = 2, 3, 7, 9
 local HANNY = 8
 local MELEE = { 100, 102, 104, 106, 578 }
 local THRUST = { 101, 103, 105, 107, 579 }
@@ -56,7 +57,8 @@ rq.skill.define({
   kind = "knowledge",
   name = "Spellblade Knowledge",
   flavor = "",
-  desc = "Specialized for swords, spears, and gloves.$"
+  desc = "Specialized for swords, daggers, spears,$"
+    .. "and gloves.$"
     .. "Effects manifest when one of those is equipped.$$"
     .. "Target:\tSelf$"
     .. "Effect:\tNo star\t... Magic +50$"
@@ -123,7 +125,7 @@ local FORMULA = {
 }
 
 local function weapon_ok(detail)
-  return detail == SWORD or detail == SPEAR_W or detail == GLOVE
+  return detail == SWORD or detail == DAGGER or detail == SPEAR_W or detail == GLOVE
 end
 
 -- Same choice Spear makes in Ｃ再計算 / Ｔ購入スキル登録, then Spellblade on top.
