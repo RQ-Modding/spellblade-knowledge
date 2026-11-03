@@ -1,15 +1,19 @@
--- Spellblade Knowledge. Shop-only for Elenoa (10), Wichita (11), Rizna (12).
+-- Spellblade Knowledge. Shop-only for Elenoa (10), Wichita (11), Rizna (12), Kisara (80).
 -- C registers the ids and calls Lua from recalc, the skill shop, physical
 -- damage (before defense), accuracy, and final-damage percent.
 -- Weapon detail ids from Ｉ種類詳細／文字列: 2 Sword, 3 Shortsword (daggers), 7 Spear
 -- (naginata is 7), 9 Glove.
 
 local KNOW = 960
+local BUYERS = { [10] = true, [11] = true, [12] = true, [80] = true }
 local SPEAR = 317
 local SWORD, DAGGER, SPEAR_W, GLOVE = 2, 3, 7, 9
 local HANNY = 8
 local MELEE = { 100, 102, 104, 106, 578 }
 local THRUST = { 101, 103, 105, 107, 579 }
+-- Brawlers (class 7) learn Strike Attack in the place of Melee (Ｔ購入スキル登録).
+local STRIKE = { 112, 113, 114, 115, 581 }
+local BRAWLER = 7
 local SB = { 961, 962, 963, 964, 965 }
 local MT = { 966, 967, 968, 969, 970 }
 
@@ -40,7 +44,7 @@ local ATTACKS = {
   { mod = "Attack x1.5 + Magic + 300", acc = -10, cap = 0 },
 }
 
-rq.log("Spellblade Knowledge: shop for chars 10/11/12; rewrite at rank>=3")
+rq.log("Spellblade Knowledge: shop for chars 10/11/12/80; rewrite at rank>=3")
 
 if not rq.skill.install() then
   error("spellblade-knowledge: rq.skill.install failed")
@@ -112,6 +116,7 @@ local INDEX = {}
 for i = 1, 5 do
   INDEX[MELEE[i]] = i
   INDEX[THRUST[i]] = i
+  INDEX[STRIKE[i]] = i
   INDEX[SB[i]] = i
   INDEX[MT[i]] = i
 end
@@ -129,8 +134,9 @@ local function weapon_ok(detail)
 end
 
 -- Same choice Spear makes in Ｃ再計算 / Ｔ購入スキル登録, then Spellblade on top.
--- Rewrites an existing Melee or Thrust id. Never grants a second skill.
-local function want_basic(idx, spell_rank, spear_rank, detail)
+-- Rewrites an existing Melee, Thrust or Strike id. Never grants a second skill.
+-- Without Spellblade a brawler gets Strike back, everyone else Melee.
+local function want_basic(idx, spell_rank, spear_rank, detail, brawler)
   local spell = spell_rank >= 3 and weapon_ok(detail)
   local spear_thrust = spear_rank >= 3 and detail == SPEAR_W
   if spell and spear_rank >= 3 then
@@ -138,6 +144,9 @@ local function want_basic(idx, spell_rank, spear_rank, detail)
   end
   if spell then
     return SB[idx]
+  end
+  if brawler then
+    return STRIKE[idx]
   end
   if spear_thrust then
     return THRUST[idx]
@@ -162,7 +171,12 @@ end
 
 -- One slot per rank. Extra copies from a stale Melee buy are folded in
 -- (uses summed, cap 99) and cleared. The hotbar entry moves with the keeper.
+local function is_brawler(iic)
+  return (rq.chara.get(iic) or {}).class == BRAWLER
+end
+
 local function collapse_owned(iic, spell_rank, spear_rank, detail)
+  local brawler = is_brawler(iic)
   local groups = {}
   for _, s in ipairs(rq.chara.slots(iic)) do
     local idx = INDEX[s.skill]
@@ -176,7 +190,7 @@ local function collapse_owned(iic, spell_rank, spear_rank, detail)
     end
   end
   for idx, group in pairs(groups) do
-    local want = want_basic(idx, spell_rank, spear_rank, detail)
+    local want = want_basic(idx, spell_rank, spear_rank, detail, brawler)
     local keep = pick_keep(group)
     if #group == 1 then
       if keep.skill ~= want then
@@ -233,11 +247,12 @@ end
 -- Swap that id in place so the level lock stays, and price extra uses off the
 -- rewritten id. A second family row for the same rank is dropped.
 local function rewrite_shop(iic, char_no, spell_rank, spear_rank, detail)
+  local brawler = is_brawler(iic)
   local seen = {}
   for _, row in ipairs(rq.chara.offers()) do
     local idx = INDEX[row.skill]
     if idx then
-      local want = want_basic(idx, spell_rank, spear_rank, detail)
+      local want = want_basic(idx, spell_rank, spear_rank, detail, brawler)
       local points = row.points or 0
       if want ~= row.skill and rq.chara.max_uses(iic, row.skill) <= 0 then
         points = use_cost(points, rq.chara.max_uses(iic, want), char_no, want)
@@ -277,7 +292,7 @@ rq.chara.on_offer(function(ctx)
   local detail = rq.chara.weapon_detail(ctx.iic)
   collapse_owned(ctx.iic, rank, spear, detail)
   rewrite_shop(ctx.iic, ctx.no, rank, spear, detail)
-  if ctx.no ~= 10 and ctx.no ~= 11 and ctx.no ~= 12 then
+  if not BUYERS[ctx.no] then
     return nil
   end
   return { skill = KNOW, cost = 3, level = 10 + rank * 5 }
