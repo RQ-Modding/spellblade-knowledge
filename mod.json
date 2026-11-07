@@ -2,7 +2,7 @@
   "$schema": "https://rq-modding.github.io/rq-modding-docs/schemas/mod.schema.json",
   "id": "spellblade-knowledge",
   "name": "Spellblade Knowledge",
-  "author": "Magnum Mods",
+  "author": "Moru Zerinho6",
   "version": "1.2.2",
   "loader": "1.15.0",
   "priority": 0
