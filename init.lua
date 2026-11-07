@@ -1,19 +1,23 @@
--- Spellblade Knowledge. Shop-only for Elenoa (10), Wichita (11), Rizna (12), Kisara (80).
+-- Spellblade Knowledge. Shop-only for Elenoa, Wichita, Rizna and Kisara.
 -- C registers the ids and calls Lua from recalc, the skill shop, physical
 -- damage (before defense), accuracy, and final-damage percent.
 -- Weapon detail ids from Ｉ種類詳細／文字列: 2 Sword, 3 Shortsword (daggers), 7 Spear
 -- (naginata is 7), 9 Glove.
 
+local SK, CH = rq.ids.skill, rq.ids.chara
+-- 960 to 970 are the engine's own numbers for this mod's skills, not the base game's.
 local KNOW = 960
-local BUYERS = { [10] = true, [11] = true, [12] = true, [80] = true }
-local SPEAR = 317
+local BUYERS = {
+  [CH.ELENOA_RAN] = true, [CH.WICHITA_SKATE] = true, [CH.RIZNA_LANFBIT] = true, [CH.KISARA_COPLEY] = true,
+}
+local SPEAR = SK.SPEAR_KNOWLEDGE
 local SWORD, DAGGER, SPEAR_W, GLOVE = 2, 3, 7, 9
 local HANNY = 8
-local MELEE = { 100, 102, 104, 106, 578 }
-local THRUST = { 101, 103, 105, 107, 579 }
+local MELEE = { SK.MELEE_ATTACK_1, SK.MELEE_ATTACK_2, SK.MELEE_ATTACK_3, SK.MELEE_ATTACK_4, SK.MELEE_ATTACK_5 }
+local THRUST = { SK.THRUST_ATTACK_1, SK.THRUST_ATTACK_2, SK.THRUST_ATTACK_3, SK.THRUST_ATTACK_4, SK.THRUST_ATTACK_5 }
 -- Brawlers (class 7) learn Strike Attack in the place of Melee (Ｔ購入スキル登録).
-local STRIKE = { 112, 113, 114, 115, 581 }
-local BRAWLER = 7
+local STRIKE = { SK.STRIKE_ATTACK_1, SK.STRIKE_ATTACK_2, SK.STRIKE_ATTACK_3, SK.STRIKE_ATTACK_4, SK.STRIKE_ATTACK_5 }
+local BRAWLER = rq.ids.class.BRAWLER
 local SB = { 961, 962, 963, 964, 965 }
 local MT = { 966, 967, 968, 969, 970 }
 
@@ -237,8 +241,8 @@ local function use_cost(base, uses, char_no, skill)
   if uses >= 3 then cost = cost + 1 end
   if uses >= 5 then cost = cost + 1 end
   if uses >= 7 then cost = cost + 1 end
-  if char_no == 18 then cost = cost + 1 end
-  if skill == 213 then cost = 1 end
+  if char_no == CH.TOMATO_PUREE then cost = cost + 1 end
+  if skill == SK.DEFENSIVE_STANCE then cost = 1 end
   if cost > 9 then cost = 9 end
   return cost
 end

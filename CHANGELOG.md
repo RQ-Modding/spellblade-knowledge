@@ -3,6 +3,11 @@
 Each section is a version of the mod, the `version` in `mod.json`. The release workflow copies the
 section of a tagged version into the release notes.
 
+## 1.2.2
+
+- The code names the game's characters, skills, items and states with `rq.ids` instead of
+  numbers. Needs loader 1.15.0. No change in the game.
+
 ## 1.2.1
 
 - `mod.json` asks for loader 0.4.0, the first with `rq.chara.get`, which 1.2.0 uses for Kisara. It
