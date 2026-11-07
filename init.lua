@@ -1,8 +1,8 @@
 -- Spellblade Knowledge. Shop-only for Elenoa, Wichita, Rizna and Kisara.
 -- C registers the ids and calls Lua from recalc, the skill shop, physical
 -- damage (before defense), accuracy, and final-damage percent.
--- Weapon detail ids from Ｉ種類詳細／文字列: 2 Sword, 3 Shortsword (daggers), 7 Spear
--- (naginata is 7), 9 Glove.
+-- The weapons it needs, by item kind (rq.ids.item_kind): Sword, Shortsword (daggers), Spear
+-- (a naginata is a Spear too) and Glove.
 
 local SK, CH = rq.ids.skill, rq.ids.chara
 -- 960 to 970 are the engine's own numbers for this mod's skills, not the base game's.
@@ -11,8 +11,9 @@ local BUYERS = {
   [CH.ELENOA_RAN] = true, [CH.WICHITA_SKATE] = true, [CH.RIZNA_LANFBIT] = true, [CH.KISARA_COPLEY] = true,
 }
 local SPEAR = SK.SPEAR_KNOWLEDGE
-local SWORD, DAGGER, SPEAR_W, GLOVE = 2, 3, 7, 9
-local HANNY = 8
+local KIND = rq.ids.item_kind
+local SWORD, DAGGER, SPEAR_W, GLOVE = KIND.SWORD, KIND.SHORTSWORD, KIND.SPEAR, KIND.GLOVE
+local HANNY = rq.ids.race.HANNY
 local MELEE = { SK.MELEE_ATTACK_1, SK.MELEE_ATTACK_2, SK.MELEE_ATTACK_3, SK.MELEE_ATTACK_4, SK.MELEE_ATTACK_5 }
 local THRUST = { SK.THRUST_ATTACK_1, SK.THRUST_ATTACK_2, SK.THRUST_ATTACK_3, SK.THRUST_ATTACK_4, SK.THRUST_ATTACK_5 }
 -- Brawlers (class 7) learn Strike Attack in the place of Melee (Ｔ購入スキル登録).

@@ -3,6 +3,11 @@
 Each section is a version of the mod, the `version` in `mod.json`. The release workflow copies the
 section of a tagged version into the release notes.
 
+## 1.2.3
+
+- The weapon kinds and the hanny's race come from `rq.ids.item_kind` and `rq.ids.race`. Needs
+  loader 1.16.0. No change in the game.
+
 ## 1.2.2
 
 - The code names the game's characters, skills, items and states with `rq.ids` instead of
