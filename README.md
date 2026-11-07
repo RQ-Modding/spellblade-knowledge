@@ -1,28 +1,54 @@
 # Spellblade Knowledge
 
-Shop-only knowledge for **Elenoa Ran (10)**, **Wichita Skate (11)**, **Rizna Lanfbit (12)**, and **Kisara Copley (80)**. Cost 3, level `10 + rank * 5` (same gate as Fighter Spear Knowledge).
+A knowledge skill for the magic swordswomen: **Elenoa Ran**, **Wichita Skate**, **Rizna Lanfbit**
+and **Kisara Copley** add magic to their weapon attacks.
 
-Lua owns who can buy it, the slot rewrite, and the damage numbers. The engine only registers the skill ids and calls Lua from recalc, the skill shop, and the physical hit path.
+## What it changes
 
-Every effect needs one of the weapons below: without one, the knowledge gives nothing, as Spear Knowledge does without a spear.
+**Spellblade Knowledge** is in their skill shops only: 3 skill points, level `10 + rank × 5` (the
+same gate as Fighter Spear Knowledge).
 
-| Rank | Stars | Magic (total, not stacked) | Accuracy | Bar |
+Every effect needs one of its weapons: a **sword**, a **dagger**, a **spear or naginata**, or a
+**glove**. Without one the knowledge gives nothing, as Spear Knowledge does without a spear.
+
+| Rank | Stars | Magic (total) | Accuracy | Basic attack |
 | --- | --- | --- | --- | --- |
 | 1 | none | +50 | — | Melee |
 | 2 | ★ | +100 | +10 | Melee |
-| 3 | ★★ | +100 | +10 | Spellblade Attack, front only |
-| 4 | ★★★ | +300 | +10 | Spellblade Attack, front only |
+| 3 | ★★ | +100 | +10 | Spellblade Attack, front row only |
+| 4 | ★★★ | +300 | +10 | Spellblade Attack, front row only |
 
-Rewrite needs a **sword (detail 2)**, **dagger (3, "Shortsword")**, **spear / naginata (7)**, or **glove (9)**. Every known Melee (or Thrust, or a brawler's Strike) slot of that rank becomes Spellblade Attack of the same rank, one slot per rank (extra copies are merged, uses summed, cap 99). The buy list swaps those ids in place, the way Spear Knowledge swaps Melee for Thrust, including the paged-list cache the buttons read, so Melee is not offered beside Spellblade and a use-upgrade targets the rewritten id. Both this knowledge and Spear Knowledge at rank ≥ 3 turn those slots and shop rows into **Magic Thrust** (back line allowed). A club, or any other weapon, writes them back to one Melee row, one Strike row for a brawler (Kisara), or one Thrust row if Spear Knowledge still applies. Nothing is granted as an extra skill. Flame Slash is left alone. Attacks stay physical, so Rizna still takes damage. Every rank deals **half final damage** to a hanny.
+- **From rank 3**, each Melee attack she knows (Thrust, or Strike Attack for a brawler such as
+  Kisara) becomes **Spellblade Attack** of the same rank. Extra copies of a rank merge into one
+  slot, with their uses added (up to 99). The skill shop offers Spellblade Attack in place of Melee,
+  so buying more uses upgrades the right skill.
+- **With Spear Knowledge at rank 3 too**, those attacks become **Magic Thrust**, which can be used
+  from the back row.
+- **Another weapon** (a club, say) turns them back into one Melee row, one Strike Attack row for a
+  brawler, or one Thrust row if Spear Knowledge still applies.
+- Nothing is added as an extra skill, and Flame Slash is left alone.
+- The attacks stay physical, so Rizna still takes damage. Every rank deals **half damage** to a
+  hanny.
 
-Local-only git. No remote.
+## Keys and settings
 
-## Test
+None.
 
-1. Only Elenoa, Wichita, Rizna, and Kisara can buy it.
-2. Rank 2 + sword: +100 Magic and +10 Accuracy. The bar still says Melee. A club: no Magic, no Accuracy.
-3. Rank 3 + sword or dagger: Spellblade Attack, front only. Same with a spear and no Spear Knowledge.
-4. Both knowledges at rank 3 + glove: Magic Thrust, back line allowed.
-5. Weapon off: ids revert.
-6. A hanny takes half.
-7. Rizna still takes the hit (physical, not magic).
+## Saves
+
+The knowledge and the rewritten attacks are in the save. Change the weapon to one that does not
+qualify before you remove the mod, so her attacks are Melee again.
+
+## Works with
+
+Potential Skill Pages: on Wichita the knowledge can be on page 2 of the shop. Kaoru Quincy QoL and
+other shop and damage mods load side by side.
+
+## Install
+
+Needs [RQ MOD](https://github.com/RQ-Modding/RQ-Mod) with loader **0.4.0** or newer. Extract the
+release zip into the game's `mods` folder, so that you have `mods/spellblade-knowledge/mod.json`.
+
+## License
+
+MIT, see [LICENSE](LICENSE).
