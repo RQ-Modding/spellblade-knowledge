@@ -11,7 +11,7 @@ No buttons and no `rq.agent.control` ids. Do not invent controls for it. It adds
 ## How to check it
 
 1. Only Elenoa (10), Wichita (11), Rizna (12) and Kisara (80) are offered it in the skill shop. On
-   Wichita it can be on page 2 (see Potential Skill Pages' TESTING.md): press `skill-page-next`,
+   Wichita it can be on page 2 (see Potential Skill Pages' TESTING.md): press `potential-skill-pages.next`,
    then buy the `offer-N` whose `value` is `960`.
 2. Rank 2 with a sword: +100 Magic and +10 Accuracy; the attack still says Melee. With a club: no
    Magic, no Accuracy.
