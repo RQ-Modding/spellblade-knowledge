@@ -3,6 +3,21 @@
 A knowledge skill for the magic swordswomen: **Elenoa Ran**, **Wichita Skate**, **Rizna Lanfbit**
 and **Kisara Copley** add magic to their weapon attacks.
 
+## Showcase
+
+### Spellblade Knowledge Skill
+
+<img width="758" height="361" alt="image" src="https://github.com/user-attachments/assets/bc68f6ad-d540-49de-a2fb-dd87b78d4f45" />
+
+### Spellblade Attack
+<img width="522" height="241" alt="image" src="https://github.com/user-attachments/assets/6b7d3f63-3728-4116-9d24-081539abcb85" />
+
+### Magic Thrust
+
+When you have both Spellblade and Spear Knowledge
+
+<img width="515" height="266" alt="image" src="https://github.com/user-attachments/assets/f98f38df-03e5-43e2-abd6-5255bef1d20e" />
+
 ## What it changes
 
 **Spellblade Knowledge** is in their skill shops only: 3 skill points, level `10 + rank × 5` (the
