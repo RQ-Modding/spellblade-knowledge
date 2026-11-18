@@ -26,7 +26,7 @@ No buttons and no `rq.agent.control` ids. Do not invent controls for it. It adds
 Use Skill Again (Skill Again in Shop keeps it in Frostbuy) to buy the ranks again. A throwaway test
 mod can `rq.chara.grant(iic, 960, rank)`. Work on a copy of the save.
 
-## Test Lab
+## Tested in the game
 
-`agent-lab.ps1 run spellblade`: a dagger turns Melee into Spellblade Attack, and its Magic and
+The Test Lab's scenario `spellblade`: a dagger turns Melee into Spellblade Attack, and its Magic and
 Accuracy need one of its weapons.
