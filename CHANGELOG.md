@@ -3,6 +3,17 @@
 Each section is a version of the mod, the `version` in `mod.json`. The release workflow copies the
 section of a tagged version into the release notes.
 
+## 1.3.0
+
+- Spellblade Attack N and Magic Thrust N are forms of Melee Attack N (`rq.skill.form_of`), as the
+  game's Thrust Attack N is. The skill shop prices and raises the row Elenoa, Wichita or Rizna holds,
+  and a planner such as Loadouts follows that row when the weapon or a knowledge changes the attack
+  it shows: a loadout with Magic Thrust saved before the knowledges loads again. Needs loader 2.66.0.
+- The shop's price for that row is the game's own, from the row held. The mod adds the rise per use
+  (one more point at 3, 5 and 7 uses) only to Kisara's Strike Attack, which is not one of the forms (a
+  class change can leave Melee and Strike side by side): before, a row the knowledge had just renamed
+  could get the rise twice.
+
 ## 1.2.3
 
 - The weapon kinds and the hanny's race come from `rq.ids.item_kind` and `rq.ids.race`. Needs

@@ -61,7 +61,7 @@ other shop and damage mods load side by side.
 
 ## Install
 
-Needs [RQ MOD](https://github.com/RQ-Modding/RQ-Mod) with loader **1.16.0** or newer. Extract the
+Needs [RQ MOD](https://github.com/RQ-Modding/RQ-Mod) with loader **2.66.0** or newer. Extract the
 release zip into the game's `mods` folder, so that you have `mods/spellblade-knowledge/mod.json`.
 
 ## License

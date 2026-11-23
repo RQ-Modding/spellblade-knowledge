@@ -115,15 +115,23 @@ for i = 1, 5 do
   if not rq.skill.sort_as(SB[i], MELEE[i]) or not rq.skill.sort_as(MT[i], MELEE[i]) then
     error("spellblade-knowledge: skill list sort hook missing")
   end
+  -- Forms of Melee Attack N (and of Thrust Attack N, the game's own form of it): the row keeps its
+  -- uses, its purchase record and its hotbar place when on_recalc swaps it, the buy list prices and
+  -- raises the row held, and a planner (Loadouts) follows the row through the swap. Strike Attack is
+  -- not one of them: a class change can leave a character with Melee N and Strike N side by side.
+  rq.skill.form_of(SB[i], MELEE[i])
+  rq.skill.form_of(MT[i], MELEE[i])
 end
 
 local INDEX = {}
+local IS_STRIKE = {}
 for i = 1, 5 do
   INDEX[MELEE[i]] = i
   INDEX[THRUST[i]] = i
   INDEX[STRIKE[i]] = i
   INDEX[SB[i]] = i
   INDEX[MT[i]] = i
+  IS_STRIKE[STRIKE[i]] = true
 end
 
 local FORMULA = {
@@ -232,8 +240,10 @@ local function collapse_owned(iic, spell_rank, spear_rank, detail)
 end
 
 -- Vanilla スキルポン bumps the point cost only when the row's id is already
--- owned. Recalc has already renamed the slot, so the Melee row looks unowned
--- and stays at the first-buy price. Reapply that curve to the rewritten id.
+-- owned. Since loader 2.66.0 the list sells the form a character holds (the forms
+-- above), priced from that row, so this is left for a brawler: the list sells
+-- Strike Attack, which is no form of Spellblade Attack, and the row looks unowned.
+-- Reapply that curve to the rewritten id.
 local function use_cost(base, uses, char_no, skill)
   if uses <= 0 then
     return base
@@ -259,7 +269,9 @@ local function rewrite_shop(iic, char_no, spell_rank, spear_rank, detail)
     if idx then
       local want = want_basic(idx, spell_rank, spear_rank, detail, brawler)
       local points = row.points or 0
-      if want ~= row.skill and rq.chara.max_uses(iic, row.skill) <= 0 then
+      -- A form of the row held was priced from it (loader 2.66.0), even when collapse_owned
+      -- has just renamed that row; only Strike Attack was priced as new.
+      if want ~= row.skill and IS_STRIKE[row.skill] and rq.chara.max_uses(iic, row.skill) <= 0 then
         points = use_cost(points, rq.chara.max_uses(iic, want), char_no, want)
       end
       if seen[want] then
